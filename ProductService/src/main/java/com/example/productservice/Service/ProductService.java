@@ -36,11 +36,9 @@ public class ProductService {
         responseDto.setCategoryId(entity.getCategoryId());
         responseDto.setBrand(entity.getBrand());
         responseDto.setPrice(entity.getPrice());
-        responseDto.setSku(entity.getSku());
         responseDto.setDescription(entity.getDescription());
         responseDto.setColor(entity.getColor());
         responseDto.setSize(entity.getSize());
-        responseDto.setWeight(entity.getWeight());
 
         return responseDto;
     }
@@ -67,9 +65,6 @@ public class ProductService {
     public List<ProductResponseDto> getProductCategoryName(String categoryName) {
         categoryName = categoryName.trim();
         List<ProductEntity> products = productRepository.findByCategoryName(categoryName);
-        if (products.isEmpty()) {
-            throw new RuntimeException("ürün bulunamadı");
-        }
         return products.stream()
                 .map(productEntity -> modelMapper.map(productEntity, ProductResponseDto.class))
                 .collect(Collectors.toList());

@@ -30,6 +30,7 @@ public class SearchService {
 
     public List<SearchResponseDto> searchByBrand(String brand) {
         List<SearchEntity> products = searchRepository.findByBrand(brand);
+        products.stream().filter(p -> p.getColor().equalsIgnoreCase("siyah")).collect(Collectors.toList());
         return convertToDto(products);
     }
 

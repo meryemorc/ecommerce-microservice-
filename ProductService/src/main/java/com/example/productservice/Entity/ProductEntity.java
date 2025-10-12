@@ -21,6 +21,5 @@ public class ProductEntity {
     private int stock;
     private String color;
     private String size;
-    private int weight;
-    private String sku; //her ürünün benzersiz kodu barkod gibi
+
 }
