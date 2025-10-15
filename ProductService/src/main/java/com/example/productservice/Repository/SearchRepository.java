@@ -2,7 +2,7 @@ package com.example.productservice.Repository;
 
 import com.example.productservice.Entity.SearchEntity;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.data.mongodb.repository.Query;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

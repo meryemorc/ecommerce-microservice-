@@ -1,6 +1,6 @@
 package com.example.productservice.Service;
 
-import com.example.productservice.Dto.Response.SearchResponseDto;
+import com.example.productservice.Dto.SearchDto;
 import com.example.productservice.Entity.SearchEntity;
 import com.example.productservice.Repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,44 +17,44 @@ public class SearchService {
     private final SearchRepository searchRepository;
     private final ModelMapper modelMapper;
 
-    private List<SearchResponseDto> convertToDto(List<SearchEntity> searchEntityList) {
+    private List<SearchDto> convertToDto(List<SearchEntity> searchEntityList) {
         return searchEntityList.stream()
-                .map(product -> modelMapper.map(product, SearchResponseDto.class))
+                .map(product -> modelMapper.map(product, SearchDto.class))
                 .collect(Collectors.toList());
     }
 
-    public List<SearchResponseDto> searchByName(String name) {
+    public List<SearchDto> searchByName(String name) {
         List<SearchEntity> products = searchRepository.findByNameContaining(name);
         return convertToDto(products);
     }
 
-    public List<SearchResponseDto> searchByBrand(String brand) {
+    public List<SearchDto> searchByBrand(String brand) {
         List<SearchEntity> products = searchRepository.findByBrand(brand);
         products.stream().filter(p -> p.getColor().equalsIgnoreCase("siyah")).collect(Collectors.toList());
         return convertToDto(products);
     }
 
-    public List<SearchResponseDto> searchByBrandAndCategory(String brand, String categoryName) {
+    public List<SearchDto> searchByBrandAndCategory(String brand, String categoryName) {
         List<SearchEntity> products = searchRepository.findByBrandAndCategoryName(brand, categoryName);
         return convertToDto(products);
     }
-    public List<SearchResponseDto> searchByPriceBetween(Double minPrice, Double maxPrice) {
+    public List<SearchDto> searchByPriceBetween(Double minPrice, Double maxPrice) {
         List<SearchEntity> products = searchRepository.findByPriceBetween(minPrice, maxPrice);
         return convertToDto(products);
     }
-    public List<SearchResponseDto> searchByBrandAndPriceBetween(String brand,Double minPrice, Double maxPrice) {
+    public List<SearchDto> searchByBrandAndPriceBetween(String brand,Double minPrice, Double maxPrice) {
         List<SearchEntity> products = searchRepository.findByBrandAndPriceBetween(brand,minPrice,maxPrice);
         return convertToDto(products);
     }
-    public List<SearchResponseDto> searchByColor(String color) {
+    public List<SearchDto> searchByColor(String color) {
         List<SearchEntity> products = searchRepository.findByColor(color);
         return convertToDto(products);
     }
-    public List<SearchResponseDto> searchByNameContainingOrderByPriceAsc(String categoryName) {
+    public List<SearchDto> searchByNameContainingOrderByPriceAsc(String categoryName) {
         List<SearchEntity> products = searchRepository.findByCategoryNameContainingOrderByPriceAsc(categoryName);
         return convertToDto(products);
     }
-    public List<SearchResponseDto> findByNameContainingOrderByPriceDesc(String categoryName) {
+    public List<SearchDto> findByNameContainingOrderByPriceDesc(String categoryName) {
         List<SearchEntity> products = searchRepository.findByCategoryNameContainingOrderByPriceDesc(categoryName);
         return convertToDto(products);
     }

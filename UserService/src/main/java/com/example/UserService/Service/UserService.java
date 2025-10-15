@@ -90,29 +90,21 @@ public class UserService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        System.out.println("=== LOGIN DEBUG ===");
-        System.out.println("Aranan username: [" + request.getUsername() + "]");
-        System.out.println("Aranan password: [" + request.getPassword() + "]");
-
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
-
-        System.out.println("Bulunan user: " + user);
 
         if (user == null) {
             System.out.println("USER NULL!");
             return new LoginResponse("kullanıcı bulunamadı", null, null);
         }
 
-        System.out.println("User password: [" + user.getPassword() + "]");
-
         if (!user.getPassword().equals(request.getPassword())) {
-            System.out.println("ŞİFRE UYUŞMUYOR!");
             return new LoginResponse("şifre hatalı", null, null);
         }
 
-        System.out.println("GİRİŞ BAŞARILI!");
         return new LoginResponse("Giriş başarılı", user.getUsername(), user.getRole());
     }
+
+
     public void register(RegisterRequest request) {
         User varMi = userRepository.findByUsername(request.getUsername()).orElse(null);
         if (varMi != null) {

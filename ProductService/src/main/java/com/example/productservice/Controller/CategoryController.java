@@ -1,6 +1,6 @@
 package com.example.productservice.Controller;
 
-import com.example.productservice.Dto.Response.CategoryResponseDto;
+import com.example.productservice.Dto.CategoryDto;
 import com.example.productservice.Entity.CategoryEntity;
 import com.example.productservice.Service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponseDto>> getAllCategories(){
-        List<CategoryResponseDto> categories = categoryService.findAll();
+    public ResponseEntity<List<CategoryDto>> getAllCategories(){
+        List<CategoryDto> categories = categoryService.findAll();
         return ResponseEntity.ok(categories);
     }
 }

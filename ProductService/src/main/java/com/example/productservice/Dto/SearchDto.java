@@ -1,5 +1,4 @@
-package com.example.productservice.Dto.Response;
-
+package com.example.productservice.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,18 +7,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchResponseDto {
+public class SearchDto {
 
-    private String id;
+    // Genel arama (basit kullanım)
+    private String keyword;      // Hem name hem description
     private String name;
     private String description;
-    private String categoryId;
-    private String categoryName;
-    private Double price;
     private String brand;
-    private Integer stock;
+    private String categoryId;
     private String color;
     private String size;
-    private String sku;
+    }
 
-}
+
