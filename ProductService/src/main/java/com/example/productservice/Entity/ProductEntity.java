@@ -3,7 +3,7 @@ package com.example.productservice.Entity;
 import org.springframework.data.annotation.Id;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.bson.types.ObjectId;
+
 import java.util.Map;
 
 @Data
@@ -11,7 +11,7 @@ import java.util.Map;
 public class ProductEntity {
 
     @Id
-    private ObjectId id;
+    private String id;
 
     private String name;
     private String description;

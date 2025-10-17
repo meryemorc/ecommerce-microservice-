@@ -6,7 +6,7 @@ import com.example.productservice.Entity.SearchEntity;
 import com.example.productservice.Repository.ProductRepository;
 import com.example.productservice.Repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -23,7 +24,7 @@ public class ProductService {
     private final ModelMapper modelMapper;
 
 
-    public ProductDto getProductById(ObjectId id) {
+    public ProductDto getProductById(String id) {
         Optional<ProductEntity> product = productRepository.findById(id);
         if (product.isEmpty()) {
             throw new RuntimeException("ürün bulunamadı");
@@ -37,7 +38,7 @@ public class ProductService {
         responseDto.setPrice(entity.getPrice());
         responseDto.setDescription(entity.getDescription());
         responseDto.setColor(entity.getColor());
-
+        responseDto.setStock(entity.getStock());
 
         return responseDto;
     }
@@ -90,6 +91,34 @@ public class ProductService {
         return search;
     }
 
+    public void decreaseStock(String productId, Integer quantity) {
+        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
+
+        if (product.getStock() < quantity) {
+            log.error("Insufficient stock for productId: {}, available: {}, requested: {}",
+                    productId, product.getStock(), quantity);
+            throw new RuntimeException("Stok yetersiz! Mevcut: " + product.getStock() + ", İstenen: " + quantity);
+        }
+
+        product.setStock(product.getStock()-quantity);
+        productRepository.save(product);
+
+        log.info("Stock decreased successfully: productId={}, newStock={}",
+                productId, product.getStock());
+
+    }
+        public boolean chechkCtock(String productId,Integer quantity){
+        try{
+            ProductEntity product = productRepository.findById(productId)
+                    .orElseThrow(()->new RuntimeException("ürün bulunamadı "));
+            boolean hasStock = product.getStock() >= quantity;
+            return hasStock;
+        }
+        catch (Exception e) {
+            log.error("Stok kontrolu yapılamadı: {}", e.getMessage());
+            return false;
+        }
+        }
 }
 
 

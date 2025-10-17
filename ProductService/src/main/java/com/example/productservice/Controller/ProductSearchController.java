@@ -5,7 +5,7 @@ import com.example.productservice.Service.ProductSearchService;
 import com.example.productservice.Service.ProductSearchService.BrandStatistics;
 import com.example.productservice.Service.ProductSearchService.CategoryCount;
 import lombok.Data;
-import org.bson.types.ObjectId;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +60,6 @@ import java.util.Map;
 
         /**
          * 4. Gelişmiş arama (çoklu filtre)
-         * POST /api/products/search/advanced
          * Body: {"brands": ["Apple", "Samsung"], "maxPrice": 50000, "minStock": 0}
          */
         @PostMapping("/advanced")

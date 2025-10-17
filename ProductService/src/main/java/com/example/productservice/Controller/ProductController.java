@@ -3,7 +3,6 @@ package com.example.productservice.Controller;
 import com.example.productservice.Dto.ProductDto;
 import com.example.productservice.Service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +15,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductDto getProductById(@PathVariable String id) {
-        ObjectId objectId = new ObjectId(id);
-        return productService.getProductById(objectId);
+        return productService.getProductById(id);
     }
     @GetMapping("/name")
     public ProductDto getProductByName(@RequestParam String name) {
@@ -36,5 +34,17 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> productDto = productService.getAllProducts();
         return ResponseEntity.ok(productDto);
+    }
+
+    @GetMapping("/{productId}/check-stock")
+    public ResponseEntity<Boolean> checStock(@PathVariable String productId,
+                                              @RequestParam Integer quantity){
+        try{
+            boolean hasStock = productService.chechkCtock(productId, quantity);
+            return ResponseEntity.ok(hasStock);
+        }
+        catch(Exception e){
+            return ResponseEntity.ok(false);
+        }
     }
 }
