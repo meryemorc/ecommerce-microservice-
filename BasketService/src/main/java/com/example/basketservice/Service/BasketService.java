@@ -27,7 +27,7 @@ public class BasketService {
 
     public BasketResponseDto addItemToBasket(AddItemRequestDto request) {
 
-        BasketModel basket = getOrCreateBasketModel(request.getUserId());
+        BasketModel basket = getOrCreateBasketModel(request.getUserId(), request.getUsername());
 
         BasketItem existingItem = basket.getItems().stream()
                 .filter(item -> item.getProductId().equals(request.getProductId()))
@@ -74,6 +74,19 @@ public class BasketService {
         }else{
             return basketResponse;
         }
+    }
+    private BasketModel getOrCreateBasketModel(Long userId, String username) {
+        BasketModel basket = basketRedisRepository.findByUserId(userId);
+
+        if (basket == null) {
+            basket = new BasketModel();
+            basket.setUserId(userId);
+            basket.setUsername(username);
+            basket.setItems(new ArrayList<>());
+            basketRedisRepository.save(basket);
+        }
+
+        return basket;
     }
     
     private BasketResponseDto convertToResponse(BasketModel basket) {

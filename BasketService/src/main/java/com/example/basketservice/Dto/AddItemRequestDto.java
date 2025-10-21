@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class AddItemRequestDto {
 
     private Long userId;
+    private String username;
     private String productId;
     private String productName;
     private Integer quantity;

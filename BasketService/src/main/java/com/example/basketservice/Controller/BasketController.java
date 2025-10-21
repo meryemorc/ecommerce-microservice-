@@ -5,6 +5,7 @@ import com.example.basketservice.Dto.BasketResponseDto;
 import com.example.basketservice.Dto.RemoveItemRequestDto;
 import com.example.basketservice.Model.BasketModel;
 import com.example.basketservice.Service.BasketService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,19 @@ public class BasketController {
     private final BasketService basketService;
 
     @PostMapping("/add-item")
-    public ResponseEntity<BasketResponseDto> addItem(@RequestBody AddItemRequestDto addItemRequest){
-        BasketResponseDto response = basketService.addItemToBasket(addItemRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> addItem(@RequestBody AddItemRequestDto request,
+                                     HttpServletRequest httpRequest) {
+
+        // Filter'dan userId ve username al
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        String username = (String) httpRequest.getAttribute("username");
+
+        // Request'e set et
+        request.setUserId(userId);
+        request.setUsername(username);
+
+        basketService.addItemToBasket(request);
+        return ResponseEntity.ok(request);
     }
 
     @DeleteMapping("/remove-item")
@@ -49,5 +60,15 @@ public class BasketController {
         String message = basketService.completeOrder(userId);
 
         return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/my-basket")
+    public ResponseEntity<?> getMyBasket(HttpServletRequest request){
+        Long userId = (Long) request.getAttribute("userId");
+        BasketModel basket =basketService.getBasket(userId);
+        if(basket == null){
+            return ResponseEntity.ok("Sepetiniz boş.");
+        }
+        return ResponseEntity.ok(basket);
     }
 }
