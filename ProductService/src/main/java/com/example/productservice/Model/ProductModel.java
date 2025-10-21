@@ -1,4 +1,4 @@
-package com.example.productservice.Entity;
+package com.example.productservice.Model;
 
 import org.springframework.data.annotation.Id;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Data
 @Document(collection = "products")
-public class ProductEntity {
+public class ProductModel {
 
     @Id
     private String id;

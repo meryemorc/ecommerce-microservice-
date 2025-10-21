@@ -1,6 +1,6 @@
 package com.example.productservice.Service;
 
-import com.example.productservice.Entity.ProductEntity;
+import com.example.productservice.Model.ProductModel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -20,20 +20,19 @@ import java.util.Map;
 public class ProductSearchService {
     private final MongoTemplate mongoTemplate;
 
-    public List<ProductEntity> searchByCategoryId(String categoryId){
-
-        Criteria criteria = Criteria.where("categoryId").is(categoryId);
+    public List<ProductModel> searchByCategoryId(String categoryId){
+           Criteria criteria = Criteria.where("categoryId").is(categoryId);
         Query query = new Query(criteria);
-        return mongoTemplate.find(query , ProductEntity.class);
+        return mongoTemplate.find(query , ProductModel.class);
     }
 
-    public List<ProductEntity> searchByPriceRange(Double minPrice, Double maxPrice){
+    public List<ProductModel> searchByPriceRange(Double minPrice, Double maxPrice){
         Criteria criteria = Criteria.where("price").gte(minPrice).lte(maxPrice);
         Query query = new Query(criteria);
-        return mongoTemplate.find(query, ProductEntity.class);
+        return mongoTemplate.find(query, ProductModel.class);
     }
     public List<CategoryCount> getProductCountByCategory() {
-        // 1. Group operation: categoryId'ye göre grupla ve say
+        // categoryId'ye göre grupla ve say
         GroupOperation groupOperation = Aggregation.group("categoryId")
                 .count().as("count");
 
@@ -54,9 +53,9 @@ public class ProductSearchService {
 
     @Data
     public static class BrandStatistics {
-        private String _id;           // brand (marka adı)
-        private Double avgPrice;      // ortalama fiyat
-        private Long productCount;    // ürün sayısı
+        private String _id;
+        private Double avgPrice;
+        private Long productCount;
     }
     public List<BrandStatistics> getBrandStatistics() {
         GroupOperation groupOperation = Aggregation.group("brand")
@@ -70,40 +69,29 @@ public class ProductSearchService {
 
         return results.getMappedResults();
     }
-    public List<ProductEntity> advancedSearch(String categoryId,List<String> brand, Double maxPrice, Integer minStock){
+    public List<ProductModel> advancedSearch(String categoryId, List<String> brand, Double maxPRice , Integer minStock){
         Criteria criteria = new Criteria();
-
-        if(categoryId != null){
-            criteria.and("categoryId").is(categoryId);
-        }
-        if(brand != null && !brand.isEmpty()){
+        if(categoryId == null ){
+            criteria.and(categoryId).is(categoryId);
+        }if(brand != null && !brand.isEmpty()){
             criteria.and("brand").in(brand);
-        }
-        if(maxPrice != null){
-            criteria.and("price").lte(maxPrice);
-        }
-        if(minStock != null){
-            criteria.and("stock").gte(minStock);
+        }if(maxPRice != null){
+            criteria.and("price").gte(maxPRice);
+        }if(minStock != null){
+            criteria.and("stock").lte(minStock);
         }
         Query query = new Query(criteria);
-        return mongoTemplate.find(query, ProductEntity.class);
+        return mongoTemplate.find(query , ProductModel.class);
     }
-    public List<ProductEntity> searchWithAttributes(String categoryId, Map<String,Object> filters){
+    public List<ProductModel>  searchWithAttributes(String categoryId, Map<String ,Object> filters){
         Criteria criteria = Criteria.where("categoryId").is(categoryId);
-
-        // filters Map'indeki her bir key-value tek tek al
-        for (Map.Entry<String, Object> entry : filters.entrySet()) {
-
-            // MongoDB'de nested(iç içe geçmişalan) field'a erişim için "attributes." ön ekini ekle
-            String key = "attributes." + entry.getKey();
-
-            // Criteria'ya yeni bir koşul ekle: attributes.ram = "8GB"
-            // .and(key) → yeni koşul ekle
-            // .is(value) → eşitlik kontrolü (=)
+        for(Map.Entry<String,Object> entry : filters.entrySet()){
+            String key= "attributes." +entry.getKey();
             criteria.and(key).is(entry.getValue());
         }
         Query query =new Query(criteria);
-        return mongoTemplate.find(query, ProductEntity.class);
+        return mongoTemplate.find(query, ProductModel.class);
     }
+
 }
 

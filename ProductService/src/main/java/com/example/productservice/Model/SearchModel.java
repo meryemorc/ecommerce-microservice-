@@ -1,4 +1,4 @@
-package com.example.productservice.Entity;
+package com.example.productservice.Model;
 
 
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class SearchEntity {
+public class SearchModel {
 
     @Id
     private String id;

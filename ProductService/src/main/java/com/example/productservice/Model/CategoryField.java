@@ -1,4 +1,4 @@
-package com.example.productservice.Entity;
+package com.example.productservice.Model;
 
 import lombok.Data;
 import java.util.List;

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class BasketRedisRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final String KEY_PREFIX = "basket:"; //her sepetin önekinde userId olacak basket:1 basket:2 gibi
+    private static final String KEY_PREFIX = "basket:"; //her sepetin ön ekinde userId olacak basket:1 basket:2 gibi
 
     public void save(BasketModel basketModel){
         String key = KEY_PREFIX + basketModel.getUserId();

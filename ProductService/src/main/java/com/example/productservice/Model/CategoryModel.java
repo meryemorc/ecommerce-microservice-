@@ -1,4 +1,4 @@
-package com.example.productservice.Entity;
+package com.example.productservice.Model;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Document(collection = "category")
-public class CategoryEntity {
+public class CategoryModel {
 
     @Id
     private String id;

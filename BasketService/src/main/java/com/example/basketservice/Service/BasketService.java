@@ -29,7 +29,6 @@ public class BasketService {
 
         BasketModel basket = getOrCreateBasketModel(request.getUserId());
 
-        // 2. Ürün sepette var mı kontrol et
         BasketItem existingItem = basket.getItems().stream()
                 .filter(item -> item.getProductId().equals(request.getProductId()))
                 .findFirst()
@@ -37,32 +36,19 @@ public class BasketService {
 
         if (existingItem != null) {
             Integer newQuantity = existingItem.getQuantity() + request.getQuantity();
-
-            // TOPLAM miktar için stok kontrolü
             boolean hasStock = userServiceClient.checkStock(request.getProductId(), newQuantity);
 
             if (!hasStock) {
-                log.error("Insufficient stock for total quantity: {}", newQuantity);
-                throw new RuntimeException("Stok yetersiz! Sepetteki ürünle birlikte toplam " +
-                        newQuantity + " adet isteniyor, ancak yeterli stok yok.");
+                throw new RuntimeException("Stok yetersiz");
             }
-
             existingItem.setQuantity(newQuantity);
-
-
         } else {
-            // Ürün sepette YOK - Yeni ürün ekle
-            log.info("New item. Checking stock: quantity={}", request.getQuantity());
-
-            // Sadece istenen miktar için stok kontrolü
             boolean hasStock = userServiceClient.checkStock(request.getProductId(), request.getQuantity());
-
             if (!hasStock) {
                 log.error("stok yetersiz productId: {}, quantity: {}",
                         request.getProductId(), request.getQuantity());
                 throw new RuntimeException("Stok yetersiz");
             }
-
             BasketItem newItem = new BasketItem(
                     request.getProductId(),
                     request.getProductName(),
@@ -73,14 +59,8 @@ public class BasketService {
             basket.addItem(newItem);
         }
 
-        // 3. Toplamları hesapla
         basket.calculateTotalPrice();
-
-        // 4. Redis'e kaydet
         basketRedisRepository.save(basket);
-
-
-        // 5. Response'a çevir ve döndür
         return convertToResponse(basket);
     }
 
@@ -107,39 +87,26 @@ public class BasketService {
     public BasketResponseDto removeItemFromBasket(RemoveItemRequestDto request) {
         BasketModel basket = basketRedisRepository.findByUserId(request.getUserId());
         if (basket == null) {
-            throw new RuntimeException("Sepet bulunamadı!");
+            throw new RuntimeException("Sepet bulunamadı");
         }
 
         basket.removeItem(request.getProductId());
         basketRedisRepository.save(basket);
-        log.info("ürün kaldırma başarılı");
         return convertToResponse(basket);
     }
     public BasketModel getBasket(Long userId) {
 
         BasketModel basket = getOrCreateBasketModel(userId);
-
         String username = userServiceClient.getUsernameById(userId);
         basket.setUsername(username);
-
         basket.calculateTotalPrice();
-
-        log.info("sepeti getirildi! getirilen kullanıcı: {}", userId);
         return basket;
     }
     public void clearBasket(Long userId) {
         basketRedisRepository.deleteByUserId(userId);
         log.info("sepeti temizlenen: {}", userId);
     }
-    /**
-     * Sipariş tamamla
-     * 1. Sepeti Redis'ten getir
-     * 2. Her ürün için RabbitMQ'ya event gönder
-     * 3. Sepeti temizle
-     */
-    /**
-     * Sipariş tamamla
-     */
+
     public String completeOrder(Long userId) {
 
         BasketModel basket = basketRedisRepository.findByUserId(userId);
@@ -147,7 +114,6 @@ public class BasketService {
         if (basket == null || basket.getItems() == null || basket.getItems().isEmpty()) {
             throw new RuntimeException("Sepet boş veya bulunamadı!");
         }
-
 
         for (BasketItem item : basket.getItems()) {
             OrderCompletedEvent event = new OrderCompletedEvent(
@@ -161,11 +127,7 @@ public class BasketService {
             log.info("Event sent: productId={}, quantity={}",
                     item.getProductId(), item.getQuantity());
         }
-
-
         clearBasket(userId);
-
-
         return "Siparişiniz alındı";
     }
 

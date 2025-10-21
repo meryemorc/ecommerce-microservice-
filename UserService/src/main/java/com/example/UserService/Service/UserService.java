@@ -6,8 +6,11 @@ import com.example.UserService.Dto.RegisterRequest;
 import com.example.UserService.Dto.UserDTO;
 import com.example.UserService.Entity.User;
 import com.example.UserService.Repository.UserRepository;
+import com.example.UserService.Utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.example.UserService.Config.PasswordEncoderConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,8 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
 
     public UserDTO findByUsername(String username) {
@@ -38,16 +43,16 @@ public class UserService {
         if (users.isEmpty()) {
             throw new RuntimeException("kullanıcı yok");
         }
-            List<UserDTO> dtoList = new ArrayList<>();
-            for (User user : users) {
-                UserDTO dto = new UserDTO();
-                dto.setUsername(user.getUsername());
-                dto.setEmail(user.getEmail());
-                dto.setRole(user.getRole());
-                dtoList.add(dto);
-            }
-            return dtoList;
+        List<UserDTO> dtoList = new ArrayList<>();
+        for (User user : users) {
+            UserDTO dto = new UserDTO();
+            dto.setUsername(user.getUsername());
+            dto.setEmail(user.getEmail());
+            dto.setRole(user.getRole());
+            dtoList.add(dto);
         }
+        return dtoList;
+    }
 
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
@@ -93,16 +98,30 @@ public class UserService {
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
 
         if (user == null) {
-            System.out.println("USER NULL!");
-            return new LoginResponse("kullanıcı bulunamadı", null, null);
+            throw new RuntimeException("Kullanıcı bulunamadı");
         }
 
-        if (!user.getPassword().equals(request.getPassword())) {
-            return new LoginResponse("şifre hatalı", null, null);
+        // Password kontrolü (BCrypt) ← DEĞİŞTİ!
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Şifre hatalı");
         }
 
-        return new LoginResponse("Giriş başarılı", user.getUsername(), user.getRole());
+        // JWT Token Generate ← YENİ!
+        String token = jwtUtils.generateToken(
+                user.getId(),
+                user.getUsername(),
+                user.getRole()
+        );
+
+        // Token ile döndür ← DEĞİŞTİ!
+        return new LoginResponse(
+                "Giriş başarılı",
+                user.getUsername(),
+                user.getRole(),
+                token  // ← YENİ!
+        );
     }
+
 
 
     public void register(RegisterRequest request) {
@@ -110,11 +129,16 @@ public class UserService {
         if (varMi != null) {
             throw new RuntimeException("bu kullanici adi kullaniliyor");
         }
+
         User yeniuser = new User();
         yeniuser.setUsername(request.getUsername());
-        yeniuser.setPassword(request.getPassword());
+
+        // Password'ü HASH'LE! ← DEĞİŞTİ!
+        yeniuser.setPassword(passwordEncoder.encode(request.getPassword()));
+
         yeniuser.setEmail(request.getEmail());
         yeniuser.setRole("USER");
         userRepository.save(yeniuser);
     }
-    }
+
+}

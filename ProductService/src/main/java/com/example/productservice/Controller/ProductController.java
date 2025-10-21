@@ -37,10 +37,10 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}/check-stock")
-    public ResponseEntity<Boolean> checStock(@PathVariable String productId,
+    public ResponseEntity<Boolean> checkStock(@PathVariable String productId,
                                               @RequestParam Integer quantity){
         try{
-            boolean hasStock = productService.chechkCtock(productId, quantity);
+            boolean hasStock = productService.checkCtock(productId, quantity);
             return ResponseEntity.ok(hasStock);
         }
         catch(Exception e){

@@ -1,8 +1,8 @@
 package com.example.productservice.Service;
 
 import com.example.productservice.Dto.ProductDto;
-import com.example.productservice.Entity.ProductEntity;
-import com.example.productservice.Entity.SearchEntity;
+import com.example.productservice.Model.ProductModel;
+import com.example.productservice.Model.SearchModel;
 import com.example.productservice.Repository.ProductRepository;
 import com.example.productservice.Repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +25,11 @@ public class ProductService {
 
 
     public ProductDto getProductById(String id) {
-        Optional<ProductEntity> product = productRepository.findById(id);
+        Optional<ProductModel> product = productRepository.findById(id);
         if (product.isEmpty()) {
             throw new RuntimeException("ürün bulunamadı");
         }
-        ProductEntity entity = product.get();
+        ProductModel entity = product.get();
         ProductDto responseDto = new ProductDto();
 
         responseDto.setName(entity.getName());
@@ -44,81 +44,72 @@ public class ProductService {
     }
 
     public ProductDto getProductByName(String name) {
-    Optional<ProductEntity> product =productRepository.findProductByName(name);
-    if(product.isEmpty()){
-        throw new RuntimeException("ürün bulunamadı");
-    }
-    ProductEntity entity = product.get();
-    return modelMapper.map(entity, ProductDto.class);
+        Optional<ProductModel> product = productRepository.findProductByName(name);
+        if (product.isEmpty()) {
+            throw new RuntimeException("ürün bulunamadı");
+        }
+        ProductModel entity = product.get();
+        return modelMapper.map(entity, ProductDto.class);
     }
 
     public ProductDto getProductByBrand(String brand) {
         String normalized = brand.trim().toLowerCase();
-        Optional<ProductEntity> product = productRepository.findProductByBrand(brand);
-        if(product.isEmpty()){
+        Optional<ProductModel> product = productRepository.findProductByBrand(brand);
+        if (product.isEmpty()) {
             throw new RuntimeException("ürün bulunamadı");
         }
-        ProductEntity entity=product.get();
+        ProductModel entity = product.get();
         return modelMapper.map(entity, ProductDto.class);
     }
 
     public List<ProductDto> getProductCategoryName(String categoryName) {
         categoryName = categoryName.trim();
-        List<ProductEntity> products = productRepository.findByCategoryName(categoryName);
+        List<ProductModel> products = productRepository.findByCategoryName(categoryName);
         return products.stream()
-                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .map(productModel -> modelMapper.map(productModel, ProductDto.class))
                 .collect(Collectors.toList());
     }
 
     public List<ProductDto> getAllProducts() {
-        List<ProductEntity> products = productRepository.findAll();
+        List<ProductModel> products = productRepository.findAll();
         return products.stream()
-                .map(productEntity -> modelMapper.map(productEntity, ProductDto.class))
+                .map(productModel -> modelMapper.map(productModel, ProductDto.class))
                 .collect(Collectors.toList());
     }
 
-    public void syncAllProductsToElasticsearch(){
-        List<ProductEntity> allProducts =productRepository.findAll();
-        for(ProductEntity products : allProducts){
-            SearchEntity search = convertToSearchDoc(products);
+    public void syncAllProductsToElasticsearch() {
+        List<ProductModel> allProducts = productRepository.findAll();
+        for (ProductModel products : allProducts) {
+            SearchModel search = convertToSearchDoc(products);
             searchRepository.save(search);
         }
     }
 
-    private SearchEntity convertToSearchDoc(ProductEntity product){
-        SearchEntity search = modelMapper.map(product, SearchEntity.class);
+    private SearchModel convertToSearchDoc(ProductModel product) {
+        SearchModel search = modelMapper.map(product, SearchModel.class);
         search.setId(product.getId().toString());
         return search;
     }
 
     public void decreaseStock(String productId, Integer quantity) {
-        ProductEntity product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
+        ProductModel product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
 
-        if (product.getStock() < quantity) {
-            log.error("Insufficient stock for productId: {}, available: {}, requested: {}",
-                    productId, product.getStock(), quantity);
-            throw new RuntimeException("Stok yetersiz! Mevcut: " + product.getStock() + ", İstenen: " + quantity);
-        }
-
-        product.setStock(product.getStock()-quantity);
+        product.setStock(product.getStock() - quantity);
         productRepository.save(product);
 
-        log.info("Stock decreased successfully: productId={}, newStock={}",
-                productId, product.getStock());
-
     }
-        public boolean chechkCtock(String productId,Integer quantity){
-        try{
-            ProductEntity product = productRepository.findById(productId)
-                    .orElseThrow(()->new RuntimeException("ürün bulunamadı "));
+
+    public boolean checkCtock(String productId, Integer quantity) {
+        try {
+            ProductModel product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("ürün bulunamadı "));
             boolean hasStock = product.getStock() >= quantity;
             return hasStock;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Stok kontrolu yapılamadı: {}", e.getMessage());
             return false;
         }
-        }
+    }
 }
 
 
