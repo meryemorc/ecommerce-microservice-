@@ -20,16 +20,20 @@ public class RabbitMQConfig {
     // mesajların etiketi
     public static final String ORDER_ROUTING_KEY = "order.completed";
 
+    public static final String BASKET_EXCHANGE = "order.exchange";
+    public static final String BASKET_QUEUE = "basket.queue";
+    public static final String BASKET_ROUTING_KEY = "basket.order";
     // Exchange oluştur (Topic Exchange)
     @Bean
     public TopicExchange orderExchange() {
+
         return new TopicExchange(ORDER_EXCHANGE);
     }
 
     // true kuyruk rstart olsa bile kuyruk silinmez demek
     @Bean
     public Queue orderQueue() {
-        return new Queue(ORDER_QUEUE, true);  // durable = true (kalıcı)
+        return new Queue(ORDER_QUEUE, true);
     }
 
     // Exchange ve Queue'yu bağla (Binding)

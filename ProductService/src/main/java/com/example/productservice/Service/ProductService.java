@@ -92,7 +92,8 @@ public class ProductService {
     }
 
     public void decreaseStock(String productId, Integer quantity) {
-        ProductModel product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
+        ProductModel product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
 
         product.setStock(product.getStock() - quantity);
         productRepository.save(product);
