@@ -21,7 +21,7 @@ public class Notification {
     private Long orderId;
     private String recipientEmail;
     private String message;
-
+    private String errorMessage;
     private boolean sent;
     @CreatedDate
     private LocalDateTime createdAt;

@@ -10,7 +10,7 @@
         </processorPath>
         <module name="NotificationService.main" />
       </profile>
-      <profile name="Annotation profile for NotificationService" enabled="true">
+      <profile name="Annotation profile for e-commerce-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
