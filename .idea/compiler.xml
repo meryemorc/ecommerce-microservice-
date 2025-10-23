@@ -18,7 +18,6 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.40/lombok-1.18.40.jar" />
         </processorPath>
         <module name="NotificationService" />
-        <module name="OrderService" />
         <module name="BasketService" />
         <module name="UserService" />
         <module name="ProductService" />
@@ -26,6 +25,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="NotificationsService" target="17" />
+      <module name="OrderService" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

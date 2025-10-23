@@ -16,6 +16,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/NotificationsService/pom.xml" />
+        <option value="$PROJECT_DIR$/OrderService/pom.xml" />
       </set>
     </option>
   </component>

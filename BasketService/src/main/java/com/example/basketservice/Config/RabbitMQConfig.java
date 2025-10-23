@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     // Exchange adı sipariş dağıtım merkezi gibi bir şey
-    public static final String ORDER_EXCHANGE = "order-exchange";
+    public static final String ORDER_EXCHANGE = "basket.exchange";
 
     // mesajları tutan kuyruk
     public static final String ORDER_QUEUE = "order-queue";
@@ -20,30 +20,41 @@ public class RabbitMQConfig {
     // mesajların etiketi
     public static final String ORDER_ROUTING_KEY = "order.completed";
 
-    public static final String BASKET_EXCHANGE = "order.exchange";
-    public static final String BASKET_QUEUE = "basket.queue";
-    public static final String BASKET_ROUTING_KEY = "basket.order";
+
+    //Notification
+    public static final String NOTIFICATION_EXCHANGE = "notification.exchange";
+
+    // Mesajın etiketi (Sipariş olayı)
+    public static final String NOTIFICATION_ORDER_PLACED_KEY = "order.placed.key";
+
+    @Bean
+    public TopicExchange notificationExchange() {
+        return new TopicExchange(NOTIFICATION_EXCHANGE, true, false);
+    }
+
+
     // Exchange oluştur (Topic Exchange)
     @Bean
     public TopicExchange orderExchange() {
-
         return new TopicExchange(ORDER_EXCHANGE);
     }
 
     // true kuyruk rstart olsa bile kuyruk silinmez demek
     @Bean
     public Queue orderQueue() {
+
         return new Queue(ORDER_QUEUE, true);
     }
 
     // Exchange ve Queue'yu bağla (Binding)
     @Bean
-    public Binding orderBinding(Queue orderQueue, TopicExchange orderExchange) {
+    public Binding orderBinding() {
         return BindingBuilder
-                .bind(orderQueue)
-                .to(orderExchange)
+                .bind(orderQueue())
+                .to(orderExchange())
                 .with(ORDER_ROUTING_KEY);
     }
+
 
     // Message Converter (JSON)
     @Bean

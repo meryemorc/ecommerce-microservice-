@@ -62,13 +62,4 @@ public class BasketController {
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/my-basket")
-    public ResponseEntity<?> getMyBasket(HttpServletRequest request){
-        Long userId = (Long) request.getAttribute("userId");
-        BasketModel basket =basketService.getBasket(userId);
-        if(basket == null){
-            return ResponseEntity.ok("Sepetiniz boş.");
-        }
-        return ResponseEntity.ok(basket);
-    }
 }

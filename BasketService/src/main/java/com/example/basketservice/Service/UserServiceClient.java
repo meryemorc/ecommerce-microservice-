@@ -21,6 +21,20 @@ public class UserServiceClient {
         }
         return null;
     }
+    public String getEmailById(Long userId) {
+        String url = USER_SERVICE_URL + "/" + userId;
+        try {
+            UserResponse response = restTemplate.getForObject(url, UserResponse.class);
+            if (response != null && response.getEmail() != null) {
+                return response.getEmail();
+            }
+            log.warn("Kullanıcı ID {} için e-posta adresi bulunamadı.", userId);
+            return null; // Veya varsayılan bir değer dönün
+        } catch (Exception e) {
+            log.error("Kullanıcı ID {} için e-posta alınamadı: {}", userId, e.getMessage());
+            return null;
+        }
+    }
     @Data
     public static class UserResponse{
         private Long userId;

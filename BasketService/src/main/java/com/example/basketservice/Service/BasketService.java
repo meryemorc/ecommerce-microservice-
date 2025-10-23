@@ -1,8 +1,6 @@
 package com.example.basketservice.Service;
 
-import com.example.basketservice.Dto.AddItemRequestDto;
-import com.example.basketservice.Dto.BasketResponseDto;
-import com.example.basketservice.Dto.RemoveItemRequestDto;
+import com.example.basketservice.Dto.*;
 import com.example.basketservice.Messaging.Publisher.OrderEventPublisher;
 import com.example.basketservice.Model.BasketItem;
 import com.example.basketservice.Model.BasketModel;
@@ -10,9 +8,14 @@ import com.example.basketservice.Model.OrderCompletedEvent;
 import com.example.basketservice.Repository.BasketRedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -23,6 +26,8 @@ public class BasketService {
     private final BasketRedisRepository basketRedisRepository;
     private final OrderEventPublisher orderEventPublisher;
     private final UserServiceClient userServiceClient;
+    private final RabbitTemplate rabbitTemplate;
+
 
 
     public BasketResponseDto addItemToBasket(AddItemRequestDto request) {
@@ -119,7 +124,41 @@ public class BasketService {
         basketRedisRepository.deleteByUserId(userId);
         log.info("sepeti temizlenen: {}", userId);
     }
+    private double calculateTotal(BasketModel basket) {
 
+        if (basket == null || basket.getItems() == null) {
+            return 0.0;
+        }
+
+        return basket.getItems().stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity()) // Her item'ın toplam fiyatı
+                .sum(); // Tüm item'ların toplamını al
+    }
+
+    private OrderPlacedEvent createOrderPlacedEvent(BasketModel basket, Long userId) {
+
+
+        String username = userServiceClient.getUsernameById(userId);
+        String userEmail = userServiceClient.getEmailById(userId);
+
+        // 2. Sepet verilerinden OrderPlacedEvent nesnesini doldurma mantığı
+        OrderPlacedEvent event = new OrderPlacedEvent();
+        event.setOrderId(UUID.randomUUID().toString());
+        event.setUserId(userId);
+        event.setOrderDate(LocalDateTime.now());
+
+        event.setUsername(username);
+        event.setUserEmail(userEmail);
+
+        List<OrderItem> items = basket.getItems().stream()
+                .map(item -> new OrderItem(item.getProductId(), item.getProductName(), item.getQuantity(), item.getPrice()))
+                .collect(Collectors.toList());
+
+        event.setItems(items);
+        event.setTotalAmount(calculateTotal(basket));
+
+        return event;
+    }
     public String completeOrder(Long userId) {
 
         BasketModel basket = basketRedisRepository.findByUserId(userId);
@@ -127,19 +166,18 @@ public class BasketService {
         if (basket == null || basket.getItems() == null || basket.getItems().isEmpty()) {
             throw new RuntimeException("Sepet boş veya bulunamadı!");
         }
-
         for (BasketItem item : basket.getItems()) {
             OrderCompletedEvent event = new OrderCompletedEvent(
                     item.getProductId(),
                     item.getQuantity(),
                     userId
             );
-
             orderEventPublisher.publishOrderCompletedEvent(event);
-
-            log.info("Event sent: productId={}, quantity={}",
-                    item.getProductId(), item.getQuantity());
         }
+
+        OrderPlacedEvent orderEvent = createOrderPlacedEvent(basket, userId);
+        orderEventPublisher.publishOrderPlacedEvent(orderEvent);
+
         clearBasket(userId);
         return "Siparişiniz alındı";
     }

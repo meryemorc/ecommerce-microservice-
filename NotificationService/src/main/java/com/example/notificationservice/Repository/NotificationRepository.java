@@ -10,5 +10,5 @@ public interface NotificationRepository extends MongoRepository<Notification,Str
 
     List<Notification> findByUserId(Long userId);
 
-    Optional<Notification> findByOrderId(Long orderId);
+
 }

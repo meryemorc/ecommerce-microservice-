@@ -18,13 +18,13 @@ public class Notification {
     @Id
     private String id;
     private Long userId;
-    private Long orderId;
+    private String orderId;
     private String recipientEmail;
     private String message;
     private String errorMessage;
     private boolean sent;
     @CreatedDate
     private LocalDateTime createdAt;
-
+    private String userEmail;
     private LocalDateTime sentAt;
 }

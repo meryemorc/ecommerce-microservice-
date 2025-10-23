@@ -1,7 +1,8 @@
 package com.example.notificationservice.Service;
 
-import com.example.notificationservice.Dto.OrderEventDto;
-import com.example.notificationservice.Dto.OrderItemDto;
+
+import com.example.notificationservice.Dto.OrderItem;
+import com.example.notificationservice.Dto.OrderPlacedEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import jakarta.mail.MessagingException;
 
 @Service
 @Slf4j
@@ -22,7 +22,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public boolean sendOrderConfirmation(OrderEventDto orderEvent, String toEmail) {
+    public boolean sendOrderConfirmation(OrderPlacedEvent orderEvent, String toEmail) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -36,10 +36,12 @@ public class EmailService {
             mailSender.send(message);
             return true;
         } catch (MessagingException e) {
+            log.error("Hata: Sipariş {} için e-posta gönderimi başarısız oldu. Alıcı: {}",
+                    orderEvent.getOrderId(), toEmail, e);
             return false;
         }
     }
-    private String buildEmailContent(OrderEventDto orderEvent) {
+    private String buildEmailContent(OrderPlacedEvent orderEvent) {
         StringBuilder html = new StringBuilder();
 
         html.append("<html><body style='font-family: Arial, sans-serif;'>");
@@ -55,7 +57,7 @@ public class EmailService {
         html.append("<th style='padding: 10px; border: 1px solid #ddd;'>Fiyat</th>");
         html.append("</tr>");
 
-        for (OrderItemDto item : orderEvent.getItems()) {
+        for (OrderItem item : orderEvent.getItems()) {
             html.append("<tr>");
             html.append("<td style='padding: 10px; border: 1px solid #ddd;'>").append(item.getProductName()).append("</td>");
             html.append("<td style='padding: 10px; text-align: center; border: 1px solid #ddd;'>").append(item.getQuantity()).append("</td>");
