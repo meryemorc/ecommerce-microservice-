@@ -17,4 +17,7 @@ public interface ProductRepository extends MongoRepository<ProductModel, String>
     Optional<ProductModel> findProductByBrand(String brand);
     @Query("{ 'categoryName': { $regex: ?0, $options: 'i' } }")
     List<ProductModel> findByCategoryName(String categoryName);
+
+
+
 }

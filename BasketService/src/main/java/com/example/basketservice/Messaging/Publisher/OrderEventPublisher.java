@@ -28,9 +28,9 @@ public class OrderEventPublisher {
     //Notification Service için
     public void publishOrderPlacedEvent(OrderPlacedEvent event) {
         rabbitTemplate.convertAndSend(
-                RabbitMQConfig.NOTIFICATION_EXCHANGE,       // Notification Exchange Adı
-                RabbitMQConfig.NOTIFICATION_ORDER_PLACED_KEY,    // Routing Key Adı
-                event                                       // OrderPlacedEvent DTO nesnesi
+                RabbitMQConfig.NOTIFICATION_EXCHANGE,
+                RabbitMQConfig.NOTIFICATION_ORDER_PLACED_KEY,
+                event
         );
         log.info("Notification Service için OrderPlacedEvent yayımlandı. Order ID: {}", event.getOrderId());
     }

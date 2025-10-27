@@ -8,6 +8,7 @@ import com.example.productservice.Repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SearchRepository searchRepository;
     private final ModelMapper modelMapper;
-
+    private final MongoTemplate mongoTemplate;
 
     public ProductDto getProductById(String id) {
         Optional<ProductModel> product = productRepository.findById(id);
@@ -31,7 +32,7 @@ public class ProductService {
         }
         ProductModel entity = product.get();
         ProductDto responseDto = new ProductDto();
-
+        responseDto.setId(entity.getId());
         responseDto.setName(entity.getName());
         responseDto.setCategoryId(entity.getCategoryId());
         responseDto.setBrand(entity.getBrand());
@@ -77,6 +78,22 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getAllBrands() {
+        return mongoTemplate.findDistinct("brand", ProductModel.class, String.class)
+                .stream()
+                .filter(brand -> brand != null && !brand.isEmpty())
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getAllColors() {
+        return mongoTemplate.findDistinct("color", ProductModel.class, String.class)
+                .stream()
+                .filter(color -> color != null && !color.isEmpty())
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     public void syncAllProductsToElasticsearch() {
         List<ProductModel> allProducts = productRepository.findAll();
         for (ProductModel products : allProducts) {
@@ -100,7 +117,7 @@ public class ProductService {
 
     }
 
-    public boolean checkCtock(String productId, Integer quantity) {
+    public boolean checkStock(String productId, Integer quantity) {
         try {
             ProductModel product = productRepository.findById(productId)
                     .orElseThrow(() -> new RuntimeException("ürün bulunamadı "));

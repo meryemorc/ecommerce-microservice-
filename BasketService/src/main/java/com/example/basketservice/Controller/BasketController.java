@@ -34,17 +34,23 @@ public class BasketController {
         return ResponseEntity.ok(request);
     }
 
-    @DeleteMapping("/remove-item")
-    public ResponseEntity<BasketResponseDto> removeItem(@RequestBody RemoveItemRequestDto removeRequest){
-        if (removeRequest.getProductId() == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        BasketResponseDto response = basketService.removeItemFromBasket(removeRequest);
-        return ResponseEntity.ok(response);
+    // BasketController.java
+    @PostMapping("/remove-item")
+    public ResponseEntity<?> removeItem(@RequestBody RemoveItemRequestDto request,
+                                        HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        BasketResponseDto basket = basketService.removeItemFromBasket(userId, request.getProductId());
+        return ResponseEntity.ok(basket); // ← Basket objesini döndür
     }
 
-    @GetMapping("/get-basket/{userId}")
-    public ResponseEntity<BasketModel> getBasket(@PathVariable Long userId){
+    // Endpoint: /api/basket/get-basket
+    @GetMapping("/get-basket")
+    public ResponseEntity<BasketModel> getBasket(HttpServletRequest httpRequest) {
+
+        Long userId = (Long) httpRequest.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
         BasketModel response = basketService.getBasket(userId);
         return ResponseEntity.ok(response);
     }
@@ -54,12 +60,13 @@ public class BasketController {
         basketService.clearBasket(userId);
     }
 
-    @PostMapping("/complete-order/{userId}")
-    public ResponseEntity<String> completeOrder(@PathVariable Long userId) {
+    // BasketController.java
+    @PostMapping("/complete-order")  // ← {userId} kaldır
+    public ResponseEntity<?> completeOrder(HttpServletRequest httpRequest) {
+        Long userId = (Long) httpRequest.getAttribute("userId");
 
-        String message = basketService.completeOrder(userId);
-
-        return ResponseEntity.ok(message);
+        basketService.completeOrder(userId);
+        return ResponseEntity.ok("Sipariş tamamlandı");
     }
 
 }

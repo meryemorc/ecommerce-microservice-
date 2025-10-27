@@ -15,17 +15,12 @@ public class OrderPlacedListener {
 
     private final NotificationService notificationService;
 
-    /**
-     * Basket Service'ten gelen OrderPlacedEvent mesajlarını dinler.
-     * Kuyruk adı RabbitMQConfig'ten alınır.
-     */
     @RabbitListener(queues = RabbitMQConfig.ORDER_NOTIFICATION_QUEUE)
     public void handleOrderPlacedEvent(OrderPlacedEvent event) {
 
         log.info("Sipariş ID: {} | Kullanıcı ID: {}", event.getOrderId(), event.getUserId());
 
         try {
-            // Gelen OrderPlacedEvent'i NotificationService'in işleme metoduna yönlendir.
             notificationService.processOrderNotification(event);
             log.info("Bildirim (E-posta/DB) İşlemi Başarıyla Tamamlandı. Order ID: {}", event.getOrderId());
 

@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class ProductDto {
 
+    private String id;
     @NotBlank(message = "ürün adı zorunludur.")
     @Size(min = 2, max = 100)
     private String name;

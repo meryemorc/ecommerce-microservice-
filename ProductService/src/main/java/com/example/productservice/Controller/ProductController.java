@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
@@ -17,20 +18,24 @@ public class ProductController {
     public ProductDto getProductById(@PathVariable String id) {
         return productService.getProductById(id);
     }
+
     @GetMapping("/name")
     public ProductDto getProductByName(@RequestParam String name) {
         return productService.getProductByName(name);
     }
+
     @GetMapping("/brand")
     public ProductDto getProductByBrand(@RequestParam String brand) {
         return productService.getProductByBrand(brand);
     }
+
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<List<ProductDto>> getProductCategory(@PathVariable String categoryName) {
         List<ProductDto> productDto = productService.getProductCategoryName(categoryName);
         return ResponseEntity.ok(productDto);
     }
-    @GetMapping
+
+    @GetMapping("/all")
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> productDto = productService.getAllProducts();
         return ResponseEntity.ok(productDto);
@@ -38,13 +43,22 @@ public class ProductController {
 
     @GetMapping("/{productId}/check-stock")
     public ResponseEntity<Boolean> checkStock(@PathVariable String productId,
-                                              @RequestParam Integer quantity){
-        try{
-            boolean hasStock = productService.checkCtock(productId, quantity);
+                                              @RequestParam Integer quantity) {
+        try {
+            boolean hasStock = productService.checkStock(productId, quantity);
             return ResponseEntity.ok(hasStock);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.ok(false);
         }
+    }
+
+    @GetMapping("/filters/brands")
+    public ResponseEntity<List<String>> getAllBrands() {
+        return ResponseEntity.ok(productService.getAllBrands());
+    }
+
+    @GetMapping("/filters/colors")
+    public ResponseEntity<List<String>> getAllColors() {
+        return ResponseEntity.ok(productService.getAllColors());
     }
 }

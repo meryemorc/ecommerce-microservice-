@@ -102,13 +102,13 @@ public class BasketService {
         response.setTotalPrice(basket.getTotalPrice());
         return response;
     }
-    public BasketResponseDto removeItemFromBasket(RemoveItemRequestDto request) {
-        BasketModel basket = basketRedisRepository.findByUserId(request.getUserId());
+    public BasketResponseDto removeItemFromBasket(Long userId, String productId) {
+        BasketModel basket = basketRedisRepository.findByUserId(userId);
         if (basket == null) {
             throw new RuntimeException("Sepet bulunamadı");
         }
-
-        basket.removeItem(request.getProductId());
+        basket.getItems().removeIf(item -> item.getProductId().equals(productId));
+        basket.calculateTotalPrice();
         basketRedisRepository.save(basket);
         return convertToResponse(basket);
     }
@@ -137,16 +137,14 @@ public class BasketService {
 
     private OrderPlacedEvent createOrderPlacedEvent(BasketModel basket, Long userId) {
 
-
         String username = userServiceClient.getUsernameById(userId);
         String userEmail = userServiceClient.getEmailById(userId);
 
-        // 2. Sepet verilerinden OrderPlacedEvent nesnesini doldurma mantığı
+        // 2. Sepet verilerinden eventı dolduruyor
         OrderPlacedEvent event = new OrderPlacedEvent();
         event.setOrderId(UUID.randomUUID().toString());
         event.setUserId(userId);
         event.setOrderDate(LocalDateTime.now());
-
         event.setUsername(username);
         event.setUserEmail(userEmail);
 
@@ -159,6 +157,7 @@ public class BasketService {
 
         return event;
     }
+
     public String completeOrder(Long userId) {
 
         BasketModel basket = basketRedisRepository.findByUserId(userId);

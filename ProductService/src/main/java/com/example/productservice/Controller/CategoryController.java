@@ -16,7 +16,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<CategoryDto>> getAllCategories(){
         List<CategoryDto> categories = categoryService.findAll();
         return ResponseEntity.ok(categories);

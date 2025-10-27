@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class RemoveItemRequestDto {
 
         private Long userId;
-        private Long productId;
+        private String productId;
 }

@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
                 throw new RuntimeException("Alıcı e-posta adresi bulunamadı. Mesaj tekrar denenmeli.");
             }
 
-
             Notification notification = new Notification();
             notification.setUserId(orderEvent.getUserId());
             notification.setOrderId(orderEvent.getOrderId());

@@ -20,12 +20,9 @@ public class RabbitMQConfig {
     // mesajların etiketi
     public static final String ORDER_ROUTING_KEY = "order.completed";
 
-
-    //Notification
     public static final String NOTIFICATION_EXCHANGE = "notification.exchange";
 
-    // Mesajın etiketi (Sipariş olayı)
-    public static final String NOTIFICATION_ORDER_PLACED_KEY = "order.placed.key";
+    public static final String NOTIFICATION_ORDER_PLACED_KEY = "notification.order.placed";
 
     @Bean
     public TopicExchange notificationExchange() {
@@ -39,10 +36,9 @@ public class RabbitMQConfig {
         return new TopicExchange(ORDER_EXCHANGE);
     }
 
-    // true kuyruk rstart olsa bile kuyruk silinmez demek
+    // true kuyruk restart olsa bile kuyruk silinmez demek
     @Bean
     public Queue orderQueue() {
-
         return new Queue(ORDER_QUEUE, true);
     }
 
