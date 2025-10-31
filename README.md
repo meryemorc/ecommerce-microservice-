@@ -3,27 +3,7 @@ E-Commerce Microservices Platform
 
 🎯 Genel Bakış
 Bu proje, modern mikroservis mimarisi prensiplerine uygun olarak geliştirilmiş, yüksek performanslı ve ölçeklenebilir bir e-ticaret platformudur. Her bir mikroservis kendi sorumluluğunu yerine getirerek, bağımsız geliştirme, dağıtım ve ölçeklendirme imkanı sunar.
-🏗️ Mimari
-Proje, mikroservis mimarisi kullanılarak geliştirilmiştir. Her servis bağımsız olarak çalışabilir ve kendi veritabanına sahiptir.
-        ┌─────────────────┐
-        │   Frontend      │
-        │   (React.js)    │
-        └────────┬────────┘
-                 │
-    ┌────────────┼────────────┬─────────────┐
-    │            │            │             │
-┌───┴────┐  ┌───┴─────┐  ┌───┴────┐  ┌─────┴──────┐
-│  User  │  │ Product │  │ Basket │  │Notification│
-│Service │  │ Service │  │Service │  │  Service   │
-└───┬────┘  └───┬─────┘  └───┬────┘  └─────┬──────┘
-    │           │            │              │
-┌───┴───┐   ┌───┴───┐    ┌───┴───┐     ┌───┴────┐
-│  PG   │   │Mongo  │    │ Redis │     │RabbitMQ│
-└───────┘   └───┬───┘    └───────┘     └────────┘
-                │
-         ┌──────┴────────┐
-         │ Elasticsearch │
-         └───────────────┘
+
 🛠️ Teknolojiler
 Backend
 
