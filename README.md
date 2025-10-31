@@ -1,17 +1,5 @@
-Elbette! Auth Service'i de çıkaralım ve daha temiz bir README hazırlayalım:
-E-Commerce Microservices Platform
-Modern mikroservis mimarisi ile geliştirilmiş, ölçeklenebilir ve güvenli bir e-ticaret platformu.
-📋 İçindekiler
 
-Genel Bakış
-Mimari
-Teknolojiler
-Mikroservisler
-Özellikler
-Kurulum
-Kullanım
-API Dokümantasyonu
-Katkıda Bulunma
+E-Commerce Microservices Platform
 
 🎯 Genel Bakış
 Bu proje, modern mikroservis mimarisi prensiplerine uygun olarak geliştirilmiş, yüksek performanslı ve ölçeklenebilir bir e-ticaret platformudur. Her bir mikroservis kendi sorumluluğunu yerine getirerek, bağımsız geliştirme, dağıtım ve ölçeklendirme imkanı sunar.
