@@ -40,7 +40,6 @@ public class RabbitMQConfig {
                 .with(NOTIFICATION_ORDER_PLACED_KEY);
     }
 
-    // --- 2. Mesaj Dönüştürücü (Converter) ---
 
     @Bean
     public MessageConverter messageConverter() {
@@ -48,7 +47,6 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-    // --- 3. Rabbit Template (İsteğe bağlı, ancak genel olarak eklenir) ---
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
